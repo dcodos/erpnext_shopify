@@ -78,6 +78,7 @@ def create_sales_order(shopify_order, shopify_settings, company=None):
 			"shopify_order_id": shopify_order.get("id"),
 			"customer": customer or shopify_settings.default_customer,
 			"delivery_date": nowdate(),
+			"transaction_date": shopify_order.get("created_at"),
 			"company": shopify_settings.company,
 			"selling_price_list": shopify_settings.price_list,
 			"ignore_pricing_rule": 1,
