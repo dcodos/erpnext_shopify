@@ -5,7 +5,7 @@ from .exceptions import ShopifyError
 from .utils import make_shopify_log
 from .sync_products import make_item
 from .sync_customers import create_customer
-from frappe.utils import flt, nowdate, cint, dateutils
+from frappe.utils import flt, nowdate, cint, dateutils, data
 from .shopify_requests import get_request, get_shopify_orders
 from erpnext.selling.doctype.sales_order.sales_order import make_delivery_note, make_sales_invoice
 product_not_exists = []
@@ -136,6 +136,8 @@ def create_delivery_note(shopify_order, shopify_settings, so):
 			dn.shopify_order_id = fulfillment.get("order_id")
 			dn.shopify_fulfillment_id = fulfillment.get("id")
 			dn.naming_series = shopify_settings.delivery_note_series or "DN-Shopify-"
+			dn.posting_date = dateutils.parse_date(fulfillment.get("created_at")[:10])
+			dn.posting_time = fulfillment.get("created_at")[11:19]
 			dn.items = get_fulfillment_items(dn.items, fulfillment.get("line_items"), shopify_settings)
 			dn.flags.ignore_mandatory = True
 			dn.save()
