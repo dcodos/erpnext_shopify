@@ -50,7 +50,7 @@ def valid_customer_and_product(shopify_order):
 def create_order(shopify_order, shopify_settings, company=None):
 	so = create_sales_order(shopify_order, shopify_settings, company)
 	if so:
-		if shopify_order.get("financial_status") == "paid" and cint(shopify_settings.sync_sales_invoice) and shopify_order.get("total_price") > 0:
+		if shopify_order.get("financial_status") == "paid" and cint(shopify_settings.sync_sales_invoice) and shopify_order.get("total_price") != "0.00":
 			create_sales_invoice(shopify_order, shopify_settings, so)
 
 		if shopify_order.get("fulfillments") and cint(shopify_settings.sync_delivery_note):
