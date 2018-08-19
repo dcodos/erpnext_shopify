@@ -8,7 +8,6 @@ from .sync_customers import create_customer
 from frappe.utils import flt, nowdate, cint, dateutils
 from .shopify_requests import get_request, get_shopify_orders
 from erpnext.selling.doctype.sales_order.sales_order import make_delivery_note, make_sales_invoice
-from datetime import datetime
 product_not_exists = []
 
 def sync_orders():
