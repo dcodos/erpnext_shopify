@@ -16,7 +16,7 @@ def sync_orders():
 def sync_shopify_orders():
 	frappe.local.form_dict.count_dict["orders"] = 0
 	shopify_settings = frappe.get_doc("Shopify Settings", "Shopify Settings")
-	
+
 	for shopify_order in get_shopify_orders():
 		if valid_customer_and_product(shopify_order):
 			try:
@@ -32,7 +32,7 @@ def sync_shopify_orders():
 				else:
 					make_shopify_log(title=e.message, status="Error", method="sync_shopify_orders", message=frappe.get_traceback(),
 						request_data=shopify_order, exception=True)
-				
+
 def valid_customer_and_product(shopify_order):
 	customer_id = shopify_order.get("customer", {}).get("id")
 	if customer_id:
@@ -44,7 +44,7 @@ def valid_customer_and_product(shopify_order):
 		if item.get("product_id") and not frappe.db.get_value("Item", {"shopify_product_id": item.get("product_id")}, "name"):
 			item = get_request("/admin/products/{}.json".format(item.get("product_id")))["product"]
 			make_item(warehouse, item, shopify_item_list=[])
-	
+
 	return True
 
 def create_order(shopify_order, shopify_settings, company=None):
@@ -77,7 +77,7 @@ def create_sales_order(shopify_order, shopify_settings, company=None):
 			"naming_series": shopify_settings.sales_order_series or "SO-Shopify-",
 			"shopify_order_id": shopify_order.get("id"),
 			"customer": customer or shopify_settings.default_customer,
-			"delivery_date": nowdate(),
+			# "delivery_date": nowdate(),
 			"company": shopify_settings.company,
 			"selling_price_list": shopify_settings.price_list,
 			"ignore_pricing_rule": 1,
@@ -86,7 +86,7 @@ def create_sales_order(shopify_order, shopify_settings, company=None):
 			"apply_discount_on": "Grand Total",
 			"discount_amount": get_discounted_amount(shopify_order),
 		})
-		
+
 		if company:
 			so.update({
 				"company": company,
@@ -98,7 +98,7 @@ def create_sales_order(shopify_order, shopify_settings, company=None):
 
 	else:
 		so = frappe.get_doc("Sales Order", so)
-		
+
 	frappe.db.commit()
 	return so
 
@@ -142,7 +142,7 @@ def create_delivery_note(shopify_order, shopify_settings, so):
 def get_fulfillment_items(dn_items, fulfillment_items, shopify_settings):
 	return [dn_item.update({"qty": item.get("quantity")}) for item in fulfillment_items for dn_item in dn_items\
 			if get_item_code(item) == dn_item.item_code]
-	
+
 def get_discounted_amount(order):
 	discounted_amount = 0.0
 	for discount in order.get("discount_codes"):
@@ -167,9 +167,9 @@ def get_order_items(order_items, shopify_settings):
 				"item_code": item_code,
 				"item_name": shopify_item.get("name"),
 				"rate": shopify_item.get("price"),
-				"delivery_date": nowdate(),
+				# "delivery_date": nowdate(),
 				"qty": shopify_item.get("quantity"),
-				"stock_uom": shopify_item.get("sku"),
+				"stock_keeping_unit": shopify_item.get("sku"),
 				"warehouse": shopify_settings.warehouse
 			})
 		else:

@@ -15,7 +15,7 @@ def sync_products(price_list, warehouse):
 	shopify_item_list = []
 	sync_shopify_items(warehouse, shopify_item_list)
 	frappe.local.form_dict.count_dict["products"] = len(shopify_item_list)
-	sync_erpnext_items(price_list, warehouse, shopify_item_list)
+	# sync_erpnext_items(price_list, warehouse, shopify_item_list)
 
 def sync_shopify_items(warehouse, shopify_item_list):
 	for shopify_item in get_shopify_items():
@@ -358,7 +358,7 @@ def get_erpnext_items(price_list):
 		item_price_condition = "and ip.modified >= '{0}' ".format(shopify_settings.last_sync_datetime)
 
 	item_from_master = """select name, item_code, item_name, item_group,
-		description, shopify_description, has_variants, variant_of, stock_uom, image, shopify_product_id, 
+		description, shopify_description, has_variants, variant_of, stock_uom, image, shopify_product_id,
 		shopify_variant_id, sync_qty_with_shopify, weight_per_unit, weight_uom, default_supplier from tabItem
 		where sync_with_shopify=1 and (variant_of is null or variant_of = '')
 		and (disabled is null or disabled = 0)  %s """ % last_sync_condition
@@ -417,7 +417,7 @@ def sync_item_with_shopify(item, price_list, warehouse):
 
 	erp_item = frappe.get_doc("Item", item.get("name"))
 	erp_item.flags.ignore_mandatory = True
-	
+
 	if not item.get("shopify_product_id"):
 		create_new_item_to_shopify(item, item_data, erp_item, variant_item_name_list)
 		sync_item_image(erp_item)
