@@ -96,7 +96,7 @@ def create_sales_order(shopify_order, shopify_settings, company=None):
 			})
 		so.flags.ignore_mandatory = True
 		so.save(ignore_permissions=True)
-		so.submit()
+		# so.submit()
 
 	else:
 		so = frappe.get_doc("Sales Order", so)
@@ -112,7 +112,7 @@ def create_sales_invoice(shopify_order, shopify_settings, so):
 		si.naming_series = shopify_settings.sales_invoice_series or "SI-Shopify-"
 		si.flags.ignore_mandatory = True
 		set_cost_center(si.items, shopify_settings.cost_center)
-		si.submit()
+		# si.submit()
 		make_payament_entry_against_sales_invoice(si, shopify_settings)
 		frappe.db.commit()
 
@@ -126,7 +126,7 @@ def make_payament_entry_against_sales_invoice(doc, shopify_settings):
 	payemnt_entry.flags.ignore_mandatory = True
 	payemnt_entry.reference_no = doc.name
 	payemnt_entry.reference_date = nowdate()
-	payemnt_entry.submit()
+	# payemnt_entry.submit()
 
 def create_delivery_note(shopify_order, shopify_settings, so):
 	for fulfillment in shopify_order.get("fulfillments"):
